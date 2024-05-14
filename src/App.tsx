@@ -1,11 +1,27 @@
+import { useEffect, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { toDoState } from './atoms';
+import { IToDoState, toDoState } from './atoms';
 import BoardComponent from './components/BoardComponent';
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  // const [initialTodos, setInitialTodos] = useState<IToDoState>({
+  //   'To Do': [],
+  //   Doing: [],
+  //   Done: [],
+  // });
+
+  useEffect(() => {
+    const todosFromLocalStorage = localStorage.getItem('todos');
+    if (todosFromLocalStorage !== null) {
+      const parsedTodos = JSON.parse(todosFromLocalStorage);
+      // setInitialTodos(parsedTodos);
+      setToDos(parsedTodos);
+      // setToDos(initialTodos);
+    }
+  }, []);
 
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
@@ -19,7 +35,10 @@ function App() {
 
         boardCopy.splice(source.index, 1);
         boardCopy.splice(destination?.index, 0, taskObj);
-
+        localStorage.setItem(
+          'todos',
+          JSON.stringify({ ...allBoards, [source.droppableId]: boardCopy })
+        );
         return { ...allBoards, [source.droppableId]: boardCopy };
       });
     }
@@ -32,6 +51,14 @@ function App() {
 
         sourceBoard.splice(source.index, 1);
         destinationBoard.splice(destination?.index, 0, taskObj);
+        localStorage.setItem(
+          'todos',
+          JSON.stringify({
+            ...allBoards,
+            [source.droppableId]: sourceBoard,
+            [destination.droppableId]: destinationBoard,
+          })
+        );
 
         return {
           ...allBoards,

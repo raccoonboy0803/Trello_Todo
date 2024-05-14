@@ -5,12 +5,12 @@ export interface ITodo {
   text: string;
 }
 
-interface IToDoState {
+export interface IToDoState {
   [key: string]: ITodo[];
 }
 
 export const toDoState = atom<IToDoState>({
-  key: 'toDoStata',
+  key: 'toDoState',
   default: {
     'To Do': [],
     Doing: [],

@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import DragComponent from './DragComponent';
-import { ITodo, toDoState } from '../atoms';
+import { ITodo, IToDoState, toDoState } from '../atoms';
 import { useSetRecoilState } from 'recoil';
 
 interface IBoardProps {
@@ -23,6 +23,22 @@ function BoardComponent({ toDos, boardId }: IBoardProps) {
       id: Date.now(),
       text: toDo,
     };
+
+    const currentTodos = localStorage.getItem('todos');
+    let todos: IToDoState = currentTodos
+      ? JSON.parse(currentTodos)
+      : {
+          'To Do': [],
+          Doing: [],
+          Done: [],
+        };
+    if (currentTodos) {
+      todos = JSON.parse(currentTodos);
+    }
+
+    todos[boardId] = [...(todos[boardId] || []), newToDo];
+    localStorage.setItem('todos', JSON.stringify(todos));
+
     setToDos((allBoards) => {
       return {
         ...allBoards,
