@@ -57,6 +57,7 @@ function BoardComponent({ toDos, boardId }: IBoardProps) {
           {...register('toDo', { required: true })}
           type="text"
           placeholder={`Add task on ${boardId}`}
+          maxLength={12}
         />
       </Form>
       <Droppable droppableId={boardId}>
@@ -73,6 +74,7 @@ function BoardComponent({ toDos, boardId }: IBoardProps) {
                 toDoId={toDo.id}
                 toDoText={toDo.text}
                 index={index}
+                boardId={boardId}
               />
             ))}
             {magic.placeholder}

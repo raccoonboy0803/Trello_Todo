@@ -2,24 +2,17 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { IToDoState, toDoState } from './atoms';
+import { toDoState } from './atoms';
 import BoardComponent from './components/BoardComponent';
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  // const [initialTodos, setInitialTodos] = useState<IToDoState>({
-  //   'To Do': [],
-  //   Doing: [],
-  //   Done: [],
-  // });
 
   useEffect(() => {
     const todosFromLocalStorage = localStorage.getItem('todos');
     if (todosFromLocalStorage !== null) {
       const parsedTodos = JSON.parse(todosFromLocalStorage);
-      // setInitialTodos(parsedTodos);
       setToDos(parsedTodos);
-      // setToDos(initialTodos);
     }
   }, []);
 
