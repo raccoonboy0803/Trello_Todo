@@ -3,7 +3,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import DragComponent from './DragComponent';
 import { ITodo, toDoState } from '../atoms';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 
 interface IBoardProps {
   toDos: ITodo[];
@@ -16,10 +16,8 @@ interface IForm {
 
 function BoardComponent({ toDos, boardId }: IBoardProps) {
   const setToDos = useSetRecoilState(toDoState);
-
-  const todoval = useRecoilValue(toDoState);
-  console.log('todoval:::', todoval);
   const { register, setValue, handleSubmit } = useForm<IForm>();
+
   const onValid = ({ toDo }: IForm) => {
     const newToDo = {
       id: Date.now(),

@@ -9,7 +9,6 @@ function App() {
 
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
-    console.log('info::', info);
 
     if (!destination) return;
 
@@ -65,16 +64,12 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 680px;
-  width: 100%;
   height: 100vh;
-  margin: 0 auto;
 `;
 
 const Boards = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  width: 100%;
   min-height: 200px;
 `;
