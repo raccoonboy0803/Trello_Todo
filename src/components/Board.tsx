@@ -22,8 +22,6 @@ interface IForm {
 }
 
 const Board = ({ toDos, boardId, index }: IProps) => {
-  console.log('toDos:::', toDos);
-
   const setToDos = useSetRecoilState(toDoState);
   const {
     register,
@@ -37,10 +35,18 @@ const Board = ({ toDos, boardId, index }: IProps) => {
   const onValid = ({ toDo }: IForm) => {
     clearErrors();
     const newToDo = { id: Date.now(), text: toDo };
-    setValue('toDo', '');
+
     setToDos((allBoards) => {
+      localStorage.setItem(
+        'todos',
+        JSON.stringify({
+          ...allBoards,
+          [boardId]: [...allBoards[boardId], newToDo],
+        })
+      );
       return { ...allBoards, [boardId]: [...allBoards[boardId], newToDo] };
     });
+    setValue('toDo', '');
   };
   return (
     <Draggable draggableId={boardId} index={index} key={boardId}>
