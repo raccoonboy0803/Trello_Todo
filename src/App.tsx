@@ -1,12 +1,19 @@
-import { useEffect, useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { useRecoilState } from 'recoil';
+import { useEffect } from 'react';
+import { DragDropContext, DragStart, Droppable } from 'react-beautiful-dnd';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { toDoState } from './atoms';
-import BoardComponent from './components/BoardComponent';
+import { BoardState, toDoState, TrashCanState } from './atoms';
+import Board from './components/Board';
+import TrashCan from './components/TrashCan';
+import { onDrageEnd } from './utils';
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [boards, setBoards] = useRecoilState(BoardState);
+  const setTrashCan = useSetRecoilState(TrashCanState);
+  const onBeforeDragStart = (info: DragStart) => {
+    if (info.type === 'DEFAULT') setTrashCan(true);
+  };
 
   useEffect(() => {
     const todosFromLocalStorage = localStorage.getItem('todos');
@@ -16,63 +23,28 @@ function App() {
     }
   }, []);
 
-  const onDragEnd = (info: DropResult) => {
-    const { destination, source } = info;
-
-    if (!destination) return;
-
-    if (destination?.droppableId === source.droppableId) {
-      setToDos((allBoards) => {
-        const boardCopy = [...allBoards[source.droppableId]];
-        const taskObj = boardCopy[source.index];
-
-        boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination?.index, 0, taskObj);
-        localStorage.setItem(
-          'todos',
-          JSON.stringify({ ...allBoards, [source.droppableId]: boardCopy })
-        );
-        return { ...allBoards, [source.droppableId]: boardCopy };
-      });
-    }
-
-    if (destination?.droppableId !== source.droppableId) {
-      setToDos((allBoards) => {
-        const sourceBoard = [...allBoards[source.droppableId]];
-        const destinationBoard = [...allBoards[destination.droppableId]];
-        const taskObj = sourceBoard[source.index];
-
-        sourceBoard.splice(source.index, 1);
-        destinationBoard.splice(destination?.index, 0, taskObj);
-        localStorage.setItem(
-          'todos',
-          JSON.stringify({
-            ...allBoards,
-            [source.droppableId]: sourceBoard,
-            [destination.droppableId]: destinationBoard,
-          })
-        );
-
-        return {
-          ...allBoards,
-          [source.droppableId]: sourceBoard,
-          [destination.droppableId]: destinationBoard,
-        };
-      });
-    }
-  };
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragEnd={(info) => onDrageEnd(info, setBoards, setToDos, setTrashCan)}
+      onBeforeDragStart={onBeforeDragStart}
+    >
       <Wrapper>
-        <Boards>
-          {Object.keys(toDos).map((boardId) => (
-            <BoardComponent
-              key={boardId}
-              boardId={boardId}
-              toDos={toDos[boardId]}
-            />
-          ))}
-        </Boards>
+        <Droppable droppableId="boards" direction="horizontal" type="board">
+          {(magic) => (
+            <Boards ref={magic.innerRef} {...magic.droppableProps}>
+              {boards.map((boardId, index) => (
+                <Board
+                  boardId={boardId}
+                  toDos={toDos[boardId]}
+                  index={index}
+                  key={index}
+                />
+              ))}
+              {magic.placeholder}
+            </Boards>
+          )}
+        </Droppable>
+        <TrashCan />
       </Wrapper>
     </DragDropContext>
   );
